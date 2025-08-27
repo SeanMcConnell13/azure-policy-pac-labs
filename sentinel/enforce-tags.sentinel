@@ -1,4 +1,4 @@
-# Simple example: require tags on all created/updated resources in the plan.
+
 import "tfplan/v2" as tfplan
 
 required_tags = ["CostCenter"]
