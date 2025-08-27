@@ -1,0 +1,26 @@
+{
+  "properties": {
+    "displayName": "Allowed locations (Custom)",
+    "policyType": "Custom",
+    "mode": "All",
+    "description": "Restrict resource creation to approved Azure regions.",
+    "parameters": {
+      "allowedLocations": {
+        "type": "Array",
+        "metadata": {
+          "description": "The list of allowed locations.",
+          "displayName": "Allowed locations"
+        }
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "location",
+        "notIn": "[parameters('allowedLocations')]"
+      },
+      "then": {
+        "effect": "Deny"
+      }
+    }
+  }
+}

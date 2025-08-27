@@ -1,0 +1,15 @@
+# Simple example: require tags on all created/updated resources in the plan.
+import "tfplan/v2" as tfplan
+
+required_tags = ["CostCenter"]
+
+main = rule {
+  all tfplan.resource_changes as rc {
+    rc.change.after is object and
+    all required_tags as t {
+      rc.change.after.tags is object and
+      t in keys(rc.change.after.tags) and
+      length(rc.change.after.tags[t]) > 0
+    }
+  }
+}

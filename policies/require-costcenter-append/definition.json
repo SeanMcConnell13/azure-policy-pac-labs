@@ -1,0 +1,39 @@
+{
+  "properties": {
+    "displayName": "Append CostCenter tag if missing",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "Ensures all resources have a CostCenter tag; appends when absent.",
+    "parameters": {
+      "tagName": {
+        "type": "String",
+        "defaultValue": "CostCenter",
+        "metadata": { "displayName": "Tag Name" }
+      },
+      "tagValue": {
+        "type": "String",
+        "defaultValue": "Unknown",
+        "metadata": { "displayName": "Default Tag Value" }
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "[concat('tags[', parameters('tagName'), ']')]",
+            "exists": "false"
+          }
+        ]
+      },
+      "then": {
+        "effect": "append",
+        "details": [
+          {
+            "field": "[concat('tags[', parameters('tagName'), ']')]",
+            "value": "[parameters('tagValue')]"
+          }
+        ]
+      }
+    }
+  }
+}
