@@ -1,15 +1,15 @@
 
 
-############################
-# Subscription data source #
-############################
+
+# Subscription data source
+
 data "azurerm_subscription" "current" {
   subscription_id = var.subscription_id
 }
 
-###########################
-# Policy: Allowed Regions #
-###########################
+
+# Policy: Allowed Regions
+
 resource "azurerm_policy_definition" "allowed_locations" {
   name         = "custom-allowed-locations"
   policy_type  = "Custom"
@@ -34,13 +34,13 @@ resource "azurerm_subscription_policy_assignment" "allowed_locations_assign" {
   parameters           = jsonencode({ allowedLocations = { value = var.approved_regions } })
 }
 
-#####################################
-# Policy: Append CostCenter tag     #
-#####################################
+
+# Policy: Append CostCenter tag
+
 resource "azurerm_policy_definition" "append_costcenter" {
   name         = "custom-append-costcenter"
   policy_type  = "Custom"
-  mode         = "All"  # <-- was Indexed; must be All to target RGs
+  mode         = "All"  
   display_name = "Add CostCenter tag (Modify)"
   metadata     = jsonencode({ category = "Tagging" })
 
@@ -66,9 +66,9 @@ resource "azurerm_subscription_policy_assignment" "append_costcenter_assign" {
   identity { type = "SystemAssigned" }
 }
 
-#########################################################
+
 # Policy: DeployIfNotExists Storage Diagnostics to LAW  #
-#########################################################
+
 resource "azurerm_policy_definition" "deployifnotexists_diag_storage" {
   name         = "custom-deployifnotexists-storage-diag"
   policy_type  = "Custom"
@@ -105,11 +105,4 @@ resource "azurerm_subscription_policy_remediation" "append_tag_remediate" {
   subscription_id      = data.azurerm_subscription.current.id
   policy_assignment_id = azurerm_subscription_policy_assignment.append_costcenter_assign.id
 }
-
-# Optional: trigger remediation from Terraform after assignment
-# resource "azurerm_subscription_policy_remediation" "storage_diag_remediate" {
-#   name                 = "remediate-storage-diag"
-#   subscription_id      = data.azurerm_subscription.current.id
-#   policy_assignment_id = azurerm_subscription_policy_assignment.deployifnotexists_diag_storage_assign.id
-# }
 
