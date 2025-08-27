@@ -1,24 +1,26 @@
 {
   "properties": {
-    "displayName": "Append CostCenter tag if missing",
+    "displayName": "Add CostCenter tag (Modify)",
     "policyType": "Custom",
-    "mode": "Indexed",
-    "description": "Ensures all resources have a CostCenter tag; appends when absent.",
+    "mode": "All",
+    "description": "Ensures all resources/resource groups have a CostCenter tag; adds it when missing.",
     "parameters": {
       "tagName": {
         "type": "String",
-        "defaultValue": "CostCenter",
-        "metadata": { "displayName": "Tag Name" }
+        "defaultValue": "CostCenter"
       },
       "tagValue": {
         "type": "String",
-        "defaultValue": "Unknown",
-        "metadata": { "displayName": "Default Tag Value" }
+        "defaultValue": "Unknown"
       }
     },
     "policyRule": {
       "if": {
-        "allOf": [
+        "anyOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Resources/subscriptions/resourceGroups"
+          },
           {
             "field": "[concat('tags[', parameters('tagName'), ']')]",
             "exists": "false"
@@ -26,13 +28,19 @@
         ]
       },
       "then": {
-        "effect": "append",
-        "details": [
-          {
-            "field": "[concat('tags[', parameters('tagName'), ']')]",
-            "value": "[parameters('tagValue')]"
-          }
-        ]
+        "effect": "modify",
+        "details": {
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
+          "operations": [
+            {
+              "operation": "addOrReplace",
+              "field": "[concat('tags[', parameters('tagName'), ']')]",
+              "value": "[parameters('tagValue')]"
+            }
+          ]
+        }
       }
     }
   }

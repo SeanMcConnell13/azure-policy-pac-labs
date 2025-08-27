@@ -3,13 +3,10 @@
     "displayName": "Deploy diagnostic settings for Storage Accounts",
     "policyType": "Custom",
     "mode": "Indexed",
-    "description": "Ensures Storage Accounts have diagnostic settings to a Log Analytics workspace.",
     "parameters": {
       "logAnalytics": {
         "type": "String",
-        "metadata": {
-          "displayName": "Log Analytics Workspace Resource ID"
-        }
+        "metadata": { "displayName": "Log Analytics Workspace Resource ID" }
       }
     },
     "policyRule": {
@@ -22,40 +19,33 @@
         "details": {
           "type": "Microsoft.Insights/diagnosticSettings",
           "existenceCondition": {
-            "field": "Microsoft.Insights/diagnosticSettings/logAnalyticsDestinationType",
-            "equals": "Dedicated"
+            "field": "Microsoft.Insights/diagnosticSettings/workspaceId",
+            "equals": "[parameters('logAnalytics')]"
           },
           "roleDefinitionIds": [
-            "/providers/microsoft.authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7"
+            "/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7"
           ],
           "deployment": {
             "properties": {
               "mode": "incremental",
+              "parameters": {
+                "logAnalytics": { "value": "[parameters('logAnalytics')]" },
+                "resourceName": { "value": "[field('name')]" }
+              },
               "template": {
                 "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
                 "contentVersion": "1.0.0.0",
+                "parameters": {
+                  "logAnalytics": { "type": "string" },
+                  "resourceName": { "type": "string" }
+                },
                 "resources": [
                   {
-                    "type": "Microsoft.Insights/diagnosticSettings",
+                    "type": "Microsoft.Storage/storageAccounts/providers/diagnosticSettings",
                     "apiVersion": "2021-05-01-preview",
-                    "name": "send-to-law",
-                    "dependsOn": [],
+                    "name": "[concat(parameters('resourceName'), '/microsoft.insights/', 'send-to-law')]",
                     "properties": {
                       "workspaceId": "[parameters('logAnalytics')]",
-                      "logs": [
-                        {
-                          "category": "StorageRead",
-                          "enabled": true
-                        },
-                        {
-                          "category": "StorageWrite",
-                          "enabled": true
-                        },
-                        {
-                          "category": "StorageDelete",
-                          "enabled": true
-                        }
-                      ],
                       "metrics": [
                         {
                           "category": "AllMetrics",
@@ -64,17 +54,7 @@
                       ]
                     }
                   }
-                ],
-                "parameters": {
-                  "logAnalytics": {
-                    "type": "string"
-                  }
-                }
-              },
-              "parameters": {
-                "logAnalytics": {
-                  "value": "[parameters('logAnalytics')]"
-                }
+                ]
               }
             }
           }

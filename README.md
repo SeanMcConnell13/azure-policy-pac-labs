@@ -1,5 +1,7 @@
 \# Azure Policy – Policy as Code Labs (Terraform + Sentinel + CI)
 
+** See azure-policy-pac-labs\docs\evidence\2025-08-27 for completion of lab work **
+
 
 
 Hands-on portfolio repo for a Cloud Security Technology \& Controls Deployment Specialist:
